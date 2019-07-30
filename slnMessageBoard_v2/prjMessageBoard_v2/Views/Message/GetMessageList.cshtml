@@ -1,0 +1,50 @@
+﻿@using System.Data
+@model System.Data.DataTable
+
+@{
+    ViewBag.Title = "留言列表";
+}
+
+<h2>留言列表</h2>
+
+
+<form method="get" action="/Message/SearchMessage">
+    <input type="text" name="keyword" placeholder="輸入標題關鍵字搜尋留言" />
+    <input type="submit" value="搜尋" />
+</form>
+<br />
+
+<table class="table">
+    <tr>
+        <th>留言編號</th>
+        <th>標題</th>
+        <th>留言者(帳號/名稱)</th>
+        <th>留言時間</th>
+    </tr>
+
+    @if (Model.Rows.Count == 0)
+    {
+        <tr>
+            <td></td>
+            <td></td>
+            <td>@ViewBag.Alert</td>
+            <td></td>
+        </tr>
+    }
+    else
+    {
+        foreach (DataRow row in Model.Rows)
+        {
+            <tr>
+                <td>@row["ID"]</td>
+                <td>
+                    <a href=@Url.Action("GetMessageContent",new { MessageID = row["ID"] })>
+                        @row["Title"]
+                    </a>
+                </td>
+                <td>@row["Account"] (@row["Name"])</td>
+                <td>@row["CreateTime"]</td>
+            </tr>
+        }
+    }
+</table>

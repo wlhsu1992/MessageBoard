@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "會員註冊";
+}
+
+<h2>會員註冊</h2>
+<hr />
+<form method="post" action="@Url.Action("CreateMember")">
+    <div>
+        <p>會員帳號  <input type="text" name="Account" placeholder="帳號不可輸入超過10碼" maxlength="10" required /></p>
+        <p>會員密碼  <input type="password" name="Password" placeholder="密碼不可輸入超過10碼" maxlength="10" required /></p>
+        <p>留言名稱  <input type="text" name="Name" placeholder="名稱不可超過10碼" maxlength="10" required  /></p>
+        <p>
+            <input type="submit" value="註冊" />
+        @if (ViewBag.Alert != null)
+        {
+            @ViewBag.Alert;
+        }
+        </p>
+    </div>
+</form>

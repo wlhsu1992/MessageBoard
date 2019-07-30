@@ -1,0 +1,14 @@
+﻿
+@{
+    ViewBag.Title = "會員登入";
+}
+
+<h2>會員登入</h2>
+
+<form method="post" action="@Url.Action("Login")">
+    <div>
+        <p>會員帳號 <input type="text" name="Account" required /></p>
+        <p>會員密碼 <input type="password" name="Password" required /></p>
+        <p><input type="submit" value="登入" />@ViewBag.Alert</p>
+    </div>
+</form>

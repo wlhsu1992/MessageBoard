@@ -1,0 +1,22 @@
+﻿@using System.Data
+@model System.Data.DataTable
+
+@{
+    ViewBag.Title = "編輯回覆留言";
+}
+
+<h2>編輯回覆留言</h2>
+
+<form method="post" action="@Url.Action("UpdateReply","Reply")">
+    <div>
+        <input type="number" name="ReplyID" value="@Model.Rows[0]["ID"]" class="hidden" />
+        <input type="number" name="MessageID" value="@Model.Rows[0]["MessageID"]" class="hidden" />
+        <input type="number" name="MemberID" value="@Session["MemberID"]" class="hidden" />
+        <p>修改內容:</p>
+        <p>
+            <textarea cols="50" rows="3" name="NewContent" placeholder="一則留言回覆上限為50字"
+                      maxlength="50" required>@Model.Rows[0]["ReplyContent"]</textarea>
+        </p>
+        <p><input type="submit" value="確認" onclick="return confirm('確認修改回覆嗎?')" /></p>
+    </div>
+</form>
