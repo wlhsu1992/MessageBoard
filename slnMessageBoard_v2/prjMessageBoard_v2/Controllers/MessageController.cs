@@ -6,18 +6,20 @@ using System.Web.Mvc;
 
 using System.Data;
 using System.Data.SqlClient;
+using prjMessageBoard_v2.Models;
 
 namespace prjMessageBoard_v2.Controllers
 {
     public class MessageController : Controller
     {
         //連接至MSSQL EXPRESS資料庫連接字串
-        string _conStr = @"Server = .\SQLEXPRESS; Database = dbMessageBoard; Integrated Security = true;";
+        string _conStr =  System.Web.Configuration.WebConfigurationManager.ConnectionStrings["dbMessageBoard"].ConnectionString;
 
         //----------------------------------------------------------------------------------------------
         // GET: Message/CreateMessage
         public ActionResult CreateMessage()
         {
+            //此為會員限定頁面，若非會員進入此頁面將頁面導回主頁
             if (Session["MemberID"] == null)
                 return RedirectToAction("GetMessageList","Message");
             else
@@ -28,23 +30,27 @@ namespace prjMessageBoard_v2.Controllers
         [HttpPost]
         public ActionResult CreateMessage(string Title, string Content)
         {
-            //使用ADO.NET在Message資料表新增留言資料 [Title,Content,CreateTime]
-            SqlConnection con = new SqlConnection(_conStr);
-            con.Open();
+            //此為會員限定頁面，若非會員進入此頁面將頁面導回主頁
+            if (Session["MemberID"] == null)
+                return RedirectToAction("GetMessageList", "Message");
 
-            SqlCommand cmd = con.CreateCommand();
-            cmd.CommandText = "dbo.usp_Message_Add";
-            cmd.CommandType = CommandType.StoredProcedure;
+            //使用ADO.NET在Message資料表新增留言記錄 [Title,Content,CreateTime]
+            using (SqlConnection con = new SqlConnection(_conStr))
+            {
+                SqlCommand cmd = con.CreateCommand();
+                cmd.CommandText = "dbo.usp_Message_Add";
+                cmd.CommandType = CommandType.StoredProcedure;
 
-            cmd.Parameters.Add("@Title", SqlDbType.NVarChar);
-            cmd.Parameters["@Title"].Value = Title;
-            cmd.Parameters.Add("@Content", SqlDbType.NVarChar);
-            cmd.Parameters["@Content"].Value = Content;
-            cmd.Parameters.Add("@MemberID", SqlDbType.Int);
-            cmd.Parameters["@MemberID"].Value = Session["MemberID"];
+                cmd.Parameters.Add("@Title", SqlDbType.NVarChar);
+                cmd.Parameters["@Title"].Value = Title;
+                cmd.Parameters.Add("@Content", SqlDbType.NVarChar);
+                cmd.Parameters["@Content"].Value = Content;
+                cmd.Parameters.Add("@MemberID", SqlDbType.Int);
+                cmd.Parameters["@MemberID"].Value = Session["MemberID"];
 
-            cmd.ExecuteNonQuery();
-            con.Close();
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
 
             return RedirectToAction("GetMessageList","Message");
         }
@@ -52,124 +58,253 @@ namespace prjMessageBoard_v2.Controllers
         // GET: Message/GetMessageList
         public ActionResult GetMessageList()
         {
-            //留言列表
-            //使用ADO.NET存取留言板資料表資料，並將其傳遞給前端
-            DataTable dt = new DataTable();
-            SqlConnection con = new SqlConnection(_conStr);
-            con.ConnectionString = _conStr;
-            SqlCommand cmd = con.CreateCommand();
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.CommandText = "dbo.usp_Message_List";
+            //建立模型物件，使其與資料庫撈取資料繫結
+            MessageBoardModel dbModel = new MessageBoardModel();
+            dbModel.message = new List<Message>();
+            dbModel.member = new List<Member>();
 
-            SqlDataAdapter adp = new SqlDataAdapter(cmd);
-            adp.Fill(dt);
+            //Message,Member資料表取得留言列表記錄
+            //留言列表 (留言編號、留言標題、留言時間、留言者帳號、留言者名稱)
+            using (SqlConnection con = new SqlConnection(_conStr))
+            {
+                SqlCommand cmd = con.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "dbo.usp_message_GetList";
+                con.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    Message message = new Message
+                    {
+                        ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                        Title = reader.GetString(reader.GetOrdinal("Title")),
+                        CreateTime = reader.GetDateTime(reader.GetOrdinal("CreateTime"))
+                    };
+                    dbModel.message.Add(message);
+                    Member member = new Member
+                    {
+                        Account = reader.GetString(reader.GetOrdinal("Account")),
+                        Name = reader.GetString(reader.GetOrdinal("Name"))
+                    };
+                    dbModel.member.Add(member);
+                }
 
-            if (dt.Rows.Count == 0)
-                ViewBag.Alert = "目前尚無留言";
-            
-            //判斷使用者是否有登入會員，分別將其導向套用不同的背板
-            if (Session["MemberID"] == null)
-                return View("GetMessageList", "_LayoutLogout", dt);
-            else
-                return View("GetMessageList", "_LayoutLogin", dt);
+                if (dbModel.message.Count == 0)
+                    ViewBag.Alert = "目前尚無留言";
+                else
+                {
+                    dbModel.message.Reverse();
+                    dbModel.member.Reverse();
+                }
+
+                //判斷使用者是否有登入會員，分別將其導向套用不同的背板
+                if (Session["MemberID"] == null)
+                    return View("GetMessageList", "_LayoutLogout", dbModel);
+                else
+                    return View("GetMessageList", "_LayoutLogin", dbModel);
+            }
         }
         //----------------------------------------------------------------------------------------------
         //GET: Message/GetMessageContent
         public ActionResult GetMessageContent(int MessageID)
         {
-            SqlConnection con = new SqlConnection(_conStr);
-            DataSet ds = new DataSet();
-            //存取顯示"留言"內容相關的資料庫欄位
-            SqlCommand cmdGetMessage = con.CreateCommand();
-            cmdGetMessage.CommandType = CommandType.StoredProcedure;
-            cmdGetMessage.CommandText = "dbo.usp_Message_GetMessage";
-            cmdGetMessage.Parameters.Add("@MessageID", SqlDbType.Int);
-            cmdGetMessage.Parameters["@MessageID"].Value = MessageID;
 
-            SqlDataAdapter adpGetMessage = new SqlDataAdapter(cmdGetMessage);
-            adpGetMessage.Fill(ds, "Message");
+            MessageBoardModel dbModel = new MessageBoardModel();
+            dbModel.member = new List<Member>();
+            dbModel.message = new List<Message>();
+            dbModel.reply = new List<Reply>();
+
+            //存取顯示"留言"內容相關的資料庫欄位
+            //由List<Member>、<Message>、<Reply> index = 0的值表示
+            //留言內容 (留言編號、留言標題、留言內容、留言時間、留言者編號、留言者名稱、留言者帳號)
+            using (SqlConnection con = new SqlConnection(_conStr))
+            {
+                SqlCommand cmd = con.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "dbo.usp_Message_GetContent";
+                cmd.Parameters.Add("@MessageID", SqlDbType.Int);
+                cmd.Parameters["@MessageID"].Value = MessageID;
+
+                con.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    Member member = new Member
+                    {
+                        Name = reader.GetString(reader.GetOrdinal("Name")),
+                        Account = reader.GetString(reader.GetOrdinal("Account"))
+                    };
+                    dbModel.member.Add(member);
+                    Message message = new Message
+                    {
+                        ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                        Title = reader.GetString(reader.GetOrdinal("Title")),
+                        Content = reader.GetString(reader.GetOrdinal("Content")),
+                        CreateTime = reader.GetDateTime(reader.GetOrdinal("CreateTime")),
+                        MemberID = reader.GetInt32(reader.GetOrdinal("MemberID"))
+                    };
+                    dbModel.message.Add(message);
+                    Reply reply = new Reply();
+                    dbModel.reply.Add(reply);
+                }
+            }
 
             //存取顯示"回覆"訊息相關的資料庫欄位
-            SqlCommand cmdGetReply = con.CreateCommand();
-            cmdGetReply.CommandType = CommandType.StoredProcedure;
-            cmdGetReply.CommandText = "dbo.usp_Reply_Get";
-            cmdGetReply.Parameters.Add("@MessageID", SqlDbType.Int);
-            cmdGetReply.Parameters["@MessageID"].Value = MessageID;
+            //由List<Member>、<Message>、<Reply> index > 0的值表示
+            //回覆內容 (回覆編號、回覆內容、回覆時間、回覆者編號、回覆者名稱、回覆者帳號)
+            using (SqlConnection con = new SqlConnection(_conStr))
+            {
+                SqlCommand cmd = con.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "dbo.usp_Reply_GetContent";
+                cmd.Parameters.Add("@MessageID", SqlDbType.Int);
+                cmd.Parameters["@MessageID"].Value = MessageID;
 
-            SqlDataAdapter adpGetReply = new SqlDataAdapter(cmdGetReply);
-            adpGetReply.Fill(ds, "Reply");
+                con.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    Member member = new Member
+                    {
+                        Name = reader.GetString(reader.GetOrdinal("Name")),
+                        Account = reader.GetString(reader.GetOrdinal("Account"))
+                    };
+                    dbModel.member.Add(member);
+                    Message message = new Message();
+                    dbModel.message.Add(message);
+                    Reply reply = new Reply
+                    {
+                        ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                        ReplyContent = reader.GetString(reader.GetOrdinal("ReplyContent")),
+                        ReplyTime = reader.GetDateTime(reader.GetOrdinal("ReplyTime")),
+                        MemberID = reader.GetInt32(reader.GetOrdinal("MemberID"))
+                    };
+                    dbModel.reply.Add(reply);
+                }
+            }
 
             if (Session["MemberID"] == null)
-                return View("GetMessageContent", "_LayoutLogout", ds);
+                return View("GetMessageContent", "_LayoutLogout", dbModel);
             else
-                return View("GetMessageContent", "_LayoutLogin", ds);
+                return View("GetMessageContent", "_LayoutLogin", dbModel);
         }
         //----------------------------------------------------------------------------------------------
         // GET: Message/SearchMessage
         public ActionResult SearchMessage(string keyword)
         {
-            //搜尋留言
-            DataTable dt = new DataTable();
-            SqlConnection con = new SqlConnection(_conStr);
-            SqlCommand cmd = con.CreateCommand();
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.CommandText = "dbo.usp_Message_Search";
-            cmd.Parameters.Add("@keyword", SqlDbType.NVarChar);
-            cmd.Parameters["@keyword"].Value = '%' + keyword + '%';
+            MessageBoardModel dbModel = new MessageBoardModel();
+            dbModel.message = new List<Message>();
+            dbModel.member = new List<Member>();
 
-            SqlDataAdapter adp = new SqlDataAdapter(cmd);
-            adp.Fill(dt);
+            //由資料庫取得 留言標題符合 keyword 關鍵字的 留言列表記錄
+            //留言列表 (留言編號、留言標題、留言時間、留言者帳號、留言者名稱)
+            using (SqlConnection con = new SqlConnection(_conStr))
+            {
+                SqlCommand cmd = con.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "dbo.usp_Message_GetTitle";
+                cmd.Parameters.Add("@keyword", SqlDbType.NVarChar);
+                cmd.Parameters["@keyword"].Value = $"%{keyword}%";
 
-            if (dt.Rows.Count == 0)
-                ViewBag.Alert = "沒有與關鍵字 「" + keyword + "」相關的標題";
+                con.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    Message message = new Message
+                    {
+                        ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                        Title = reader.GetString(reader.GetOrdinal("Title")),
+                        CreateTime = reader.GetDateTime(reader.GetOrdinal("CreateTime"))
+                    };
+                    dbModel.message.Add(message);
+                    Member member = new Member
+                    {
+                        Account = reader.GetString(reader.GetOrdinal("Account")),
+                        Name = reader.GetString(reader.GetOrdinal("Name"))
+                    };
+                    dbModel.member.Add(member);
+                }
 
-            if (Session["MemberID"] == null)
-                return View("GetMessageList", "_LayoutLogout", dt);
-            else
-                return View("GetMessageList", "_LayoutLogin", dt);
+                if (dbModel.message.Count == 0)
+                    ViewBag.Alert = $"沒有與關鍵字「{keyword}」相關的標題";
+                else
+                { 
+                    dbModel.message.Reverse();
+                    dbModel.member.Reverse();
+                }
+                //判斷使用者是否有登入會員，分別將其導向套用不同的背板
+                if (Session["MemberID"] == null)
+                    return View("GetMessageList", "_LayoutLogout", dbModel);
+                else
+                    return View("GetMessageList", "_LayoutLogin", dbModel);
+            }
         }
         //-------------------------------------------------------------------------------------------------
         //GET: Message/UpdateMessage
         public ActionResult UpdateMessage(int MessageID)
         {
+            //此為會員限定頁面，若非會員進入此頁面將頁面導回主頁
             if (Session["MemberID"] == null)
                 return RedirectToAction("GetMessageList", "Message");
 
-            DataTable dt = new DataTable();
-            SqlConnection con = new SqlConnection(_conStr);
-            SqlCommand cmd = con.CreateCommand();
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.CommandText = "dbo.usp_Message_Get";
-            cmd.Parameters.Add("@MessageID", SqlDbType.Int);
-            cmd.Parameters["@MessageID"].Value = MessageID;
+            MessageBoardModel dbModel = new MessageBoardModel();
+            dbModel.message = new List<Message>();
 
-            SqlDataAdapter adp = new SqlDataAdapter(cmd);
-            adp.Fill(dt);
+            //由Message資料表取得 指定留言編號的 留言內容
+            //留言內容 (留言編號、留言標題、留言時間)
+            using (SqlConnection con = new SqlConnection(_conStr))
+            {
+                SqlCommand cmd = con.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "dbo.usp_Message_GetMessage";
+                cmd.Parameters.Add("@MessageID", SqlDbType.Int);
+                cmd.Parameters["@MessageID"].Value = MessageID;
 
-            return View("UpdateMessage","_LayoutLogin", dt);
+                con.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    Message message = new Message
+                    {
+                        ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                        Title = reader.GetString(reader.GetOrdinal("Title")),
+                        Content = reader.GetString(reader.GetOrdinal("Content")),
+                        MemberID = reader.GetInt32(reader.GetOrdinal("MemberID"))
+                    };
+                    dbModel.message.Add(message);
+                }
+            }
+            return View("UpdateMessage", "_LayoutLogin", dbModel);
         }
         //---------------------------------------------------------------------------------------------------
         //POST: Message/UpdateMessage
         [HttpPost]
         public ActionResult UpdateMessage(int MessageID, int MemberID, string NewTitle, string NewContent)
         {
-            SqlConnection con = new SqlConnection(_conStr);
-            con.Open();
-            SqlCommand cmd = con.CreateCommand();
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.CommandText = "dbo.usp_Message_Update";
+            //此為會員限定頁面，若非會員進入此頁面將頁面導回主頁
+            if (Session["MemberID"] == null)
+                return RedirectToAction("GetMessageList", "Message");
 
-            cmd.Parameters.Add("@NewTitle", SqlDbType.NVarChar);
-            cmd.Parameters["@NewTitle"].Value = NewTitle;
-            cmd.Parameters.Add("@NewContent", SqlDbType.NVarChar);
-            cmd.Parameters["@NewContent"].Value = NewContent;
-            cmd.Parameters.Add("@MessageID", SqlDbType.Int);
-            cmd.Parameters["@MessageID"].Value = MessageID;
-            cmd.Parameters.Add("@MemberID", SqlDbType.Int);
-            cmd.Parameters["@MemberID"].Value = MemberID;
+            //將表單輸入的留言內容，更新回指定ID的message資料表
+            //更新欄位 (留言編號、留言標題、留言時間)
+            using (SqlConnection con = new SqlConnection(_conStr))
+            {
+                SqlCommand cmd = con.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "dbo.usp_Message_Update";
 
-            cmd.ExecuteNonQuery();
-            con.Close();
+                cmd.Parameters.Add("@NewTitle", SqlDbType.NVarChar);
+                cmd.Parameters["@NewTitle"].Value = NewTitle;
+                cmd.Parameters.Add("@NewContent", SqlDbType.NVarChar);
+                cmd.Parameters["@NewContent"].Value = NewContent;
+                cmd.Parameters.Add("@MessageID", SqlDbType.Int);
+                cmd.Parameters["@MessageID"].Value = MessageID;
+                cmd.Parameters.Add("@MemberID", SqlDbType.Int);
+                cmd.Parameters["@MemberID"].Value = MemberID;
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
             return RedirectToAction("GetMessageContent","Message", new { MessageID = MessageID });
         }
         //---------------------------------------------------------------------------------------------------
@@ -177,17 +312,22 @@ namespace prjMessageBoard_v2.Controllers
         [HttpPost]
         public ActionResult DeleteMessage(int MessageID)
         {
-            SqlConnection con = new SqlConnection(_conStr);
-            con.Open();
+            //此為會員限定頁面，若非會員進入此頁面將頁面導回主頁
+            if (Session["MemberID"] == null)
+                return RedirectToAction("GetMessageList", "Message");
 
-            SqlCommand cmd = con.CreateCommand();
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.CommandText = "dbo.usp_Message_Delete";
-            cmd.Parameters.Add("@MessageID", SqlDbType.Int);
-            cmd.Parameters["@MessageID"].Value = MessageID;
+            //於message資料表中，刪除指定ID的記錄
+            using (SqlConnection con = new SqlConnection(_conStr))
+            {
+                SqlCommand cmd = con.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "dbo.usp_Message_Delete";
+                cmd.Parameters.Add("@MessageID", SqlDbType.Int);
+                cmd.Parameters["@MessageID"].Value = MessageID;
 
-            cmd.ExecuteNonQuery();
-            con.Close();
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
             return RedirectToAction("GetMessageList");
         }
     }

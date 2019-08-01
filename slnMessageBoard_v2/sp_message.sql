@@ -11,16 +11,15 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE dbo.usp_Message_List
+CREATE PROCEDURE dbo.usp_Message_GetList
 AS
 BEGIN
 	SELECT Member.Name,Member.Account,Message.ID,Message.Title,Message.CreateTime 
 	FROM Message Join Member ON Message.MemberID = Member.ID 
-	ORDER BY ID DESC
 END
 GO
 
-CREATE PROCEDURE dbo.usp_Message_GetMessage
+CREATE PROCEDURE dbo.usp_Message_GetContent
 (
 	@MessageID INT
 )
@@ -33,7 +32,7 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE dbo.usp_Message_Get
+CREATE PROCEDURE dbo.usp_Message_GetMessage
 (
 	@MessageID INT
 )
@@ -44,7 +43,7 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE dbo.usp_Message_Search
+CREATE PROCEDURE dbo.usp_Message_GetTitle
 (
 	@keyword NVARCHAR(20)
 )
@@ -53,7 +52,6 @@ BEGIN
 	SELECT Member.Name,Member.Account,Message.ID,Message.Title,Message.CreateTime
 	FROM Message Join Member ON Message.MemberID = Member.ID
 	WHERE Message.Title LIKE @keyword  
-	ORDER BY ID DESC
 END
 GO
 
@@ -68,7 +66,7 @@ AS
 BEGIN
 	UPDATE Message
 	SET Title = @NewTitle,Content = @NewContent
-	WHERE ID = @MessageID AND MemberID = @MemberID
+	WHERE ID = @MessageID
 END
 GO
 

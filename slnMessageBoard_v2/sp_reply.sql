@@ -11,14 +11,14 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE dbo.usp_Reply_Get
+CREATE PROCEDURE dbo.usp_Reply_GetContent
 (
 	@MessageID INT
 )
 AS
 BEGIN
-	SELECT Member.Name,Member.Account,Member.ID, 
-           ReplyMessage.ReplyContent,ReplyMessage.ReplyTime,ReplyMessage.MemberID,ReplyMessage.ID AS ReplyID
+	SELECT Member.Name,Member.Account, 
+           ReplyMessage.ID ,ReplyMessage.ReplyContent,ReplyMessage.ReplyTime,ReplyMessage.MemberID
     FROM Member Join ReplyMessage ON Member.ID = ReplyMessage.MemberID
     WHERE ReplyMessage.MessageID = @MessageID
 END
@@ -45,7 +45,7 @@ AS
 BEGIN
 	UPDATE ReplyMessage
 	SET ReplyContent = @NewContent
-	WHERE ID = @ReplyID AND MemberID = @MemberID
+	WHERE ID = @ReplyID
 END
 GO
 

@@ -1,4 +1,4 @@
-CREATE PROCEDURE dbo.usp_Member_Check
+CREATE PROCEDURE dbo.usp_Member_GetAccount
 (
   @Account VARCHAR(10)
 )
@@ -21,7 +21,7 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE dbo.usp_Member_Login
+CREATE PROCEDURE dbo.usp_Member_GetAccountAndPassword
 (
 	@Account VARCHAR(10),
 	@Password VARCHAR(10)

@@ -1,35 +1,36 @@
 ﻿@using System.Data
-@model System.Data.DataSet
+@model prjMessageBoard_v2.Models.MessageBoardModel
 
 @{
-    ViewBag.Title = "留言板" + Model.Tables["Message"].Rows[0]["Title"];
+    ViewBag.Title = "留言板" + Model.message[0].Title;
 }
 
 
-<h3><span>標題 : </span>@Model.Tables["Message"].Rows[0]["Title"]</h3>
-<span>留言者:</span> @Model.Tables["Message"].Rows[0]["Account"] (@Model.Tables["Message"].Rows[0]["Name"])
+
+<h3><span>標題 : </span>@Model.message[0].Title</h3>
+<span>留言者:</span> @Model.member[0].Account (@Model.member[0].Name)
 ---
-<span>留言時間:</span> @Model.Tables["Message"].Rows[0]["CreateTime"]
+<span>留言時間:</span> @Model.message[0].CreateTime
 
 <hr />
 <h3>留言內容</h3>
 <textarea cols="100" rows="10" readonly>
-@Model.Tables["Message"].Rows[0]["Content"]
+@Model.message[0].Content
 </textarea>
 
 <p>
-    @if (Session["MemberID"] != null && Session["MemberID"].Equals(Model.Tables["Message"].Rows[0]["MemberID"]))
+    @if (Session["MemberID"] != null && Session["MemberID"].Equals(Model.message[0].MemberID))
     {
         <div class="row">
             <div class="col-lg-1">
                 <form method="get" action="@Url.Action("UpdateMessage")">
-                    <input type="number" name="MessageID" value="@Model.Tables["Message"].Rows[0]["ID"]" class="hidden" />
+                    <input type="number" name="MessageID" value="@Model.message[0].ID" class="hidden" />
                     <input type="submit" value="修改留言" />
                 </form>
             </div>
             <div>
                 <form method="post" action="@Url.Action("DeleteMessage")">
-                    <input type="number" name="MessageID" value="@Model.Tables["Message"].Rows[0]["ID"]" class="hidden" />
+                    <input type="number" name="MessageID" value="@Model.message[0].ID" class="hidden" />
                     <input type="submit" value="刪除留言" onclick="return confirm('刪除留言會一併刪除回覆，確定要刪除留言嗎?')" />
                 </form>
             </div>
@@ -39,36 +40,36 @@
 
 <hr />
 
-@if (@Model.Tables["Reply"].Rows.Count == 0)
+@if (@Model.reply.Count == 1)
 {
     <div>尚無任何回覆------</div>
 }
 else
 {
-    for (int i = 0; i < Model.Tables["Reply"].Rows.Count; i++)
+    for (int i = 1; i < Model.reply.Count; i++)
     {
         <hr />
-        <h4>#回覆@(i + 1)</h4>
-        <textarea cols="50" rows="3" readonly>@Model.Tables["Reply"].Rows[i]["ReplyContent"]</textarea>
+        <h4>#回覆@(i)</h4>
+        <textarea cols="50" rows="3" readonly>@Model.reply[i].ReplyContent</textarea>
         <p>
-            <span>留言者:</span> @Model.Tables["Reply"].Rows[i]["Account"] (@Model.Tables["Reply"].Rows[i]["Name"])
-            <span>留言時間:</span> @Model.Tables["Reply"].Rows[i]["ReplyTime"]
+            <span>留言者:</span> @Model.member[i].Account (@Model.member[i].Name)
+            <span>留言時間:</span> @Model.reply[i].ReplyTime
         </p>
 
         <p>
-            @if (Session["MemberID"] != null && Session["MemberID"].Equals(Model.Tables["Reply"].Rows[i]["MemberID"]))
+            @if (Session["MemberID"] != null && Session["MemberID"].Equals(Model.reply[i].MemberID))
             {
                 <div class="row">
                     <div class="col-lg-1">
                         <form method="get" action="@Url.Action("UpdateReply","Reply")">
-                            <input type="number" name="ReplyID" value="@Model.Tables["Reply"].Rows[i]["ReplyID"]" class="hidden" />
+                            <input type="number" name="ReplyID" value="@Model.reply[i].ID" class="hidden" />
                             <input type="submit" value="修改回覆" />
                         </form>
                     </div>
                     <div>
                         <form method="post" action="@Url.Action("DeleteReply","Reply")">
-                            <input type="number" value="@Model.Tables["Reply"].Rows[i]["ReplyID"]" name="ReplyID" class="hidden" />
-                            <input type="number" value="@Model.Tables["Message"].Rows[0]["ID"]" name="MessageID" class="hidden" />
+                            <input type="number" value="@Model.reply[i].ID" name="ReplyID" class="hidden" />
+                            <input type="number" value="@Model.message[0].ID" name="MessageID" class="hidden" />
                             <input type="submit" value="刪除回覆" onclick="return confirm('確定要刪除回覆嗎?')" />
                         </form>
                     </div>
@@ -84,11 +85,13 @@ else
 {
     <form method="post" action="@Url.Action("CreateReply","Reply")">
         <div>
-            <input type="number" name="MessageID" value="@Model.Tables["Message"].Rows[0]["ID"]" class="hidden" />
+            <input type="number" name="MessageID" value="@Model.message[0].ID" class="hidden" />
             <input type="number" name="MemberID" value="@Session["MemberID"]" class="hidden" />
             <p>回覆內容:</p>
-            <p><textarea cols="50" rows="3" name="ReplyContent" placeholder="一則留言回覆上限為50字" 
-                        maxlength="50" required></textarea></p>
+            <p>
+                <textarea cols="50" rows="3" name="ReplyContent" placeholder="一則留言回覆上限為50字"
+                          maxlength="50" required></textarea>
+            </p>
             <p><input type="submit" value="回覆留言" /></p>
         </div>
     </form>
