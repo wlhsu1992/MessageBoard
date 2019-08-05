@@ -29,3 +29,11 @@ sp_member、sp_message、sp_reply 為MSSQL stored procedure create 檔案
 8. 將所有需要會員權限使用的控制器，在一開始加入Session會員驗證，
 　 若不屬於會員直接將頁面導向預設主頁
   =================================================================================================
+[第二次改動-針對issue部分修改]
+1. 新增SessionManager類別，集中擺放專案使用Session，可通過該類別方法存取Session。
+
+2. 新增標準註解格式。
+
+3. 通過繼承AuthorizeAttribute類別及覆寫其方法，新增自定義判斷會員是否為登入狀態的Attribute。
+
+4. 在Model資料夾下新增ModelManager類別，存放原Controller中操作資料庫程序的程式碼。
