@@ -32,7 +32,7 @@ sp_member、sp_message、sp_reply 為MSSQL stored procedure create 檔案
 [第二次改動-針對issue部分修改]
 1. 於Model資料夾新增SessionManager類別，集中擺放專案使用Session，可通過該類別方法存取Session。
 
-2. 新增標準註解格式。
+2. 於方法、動作方法、屬性新增標準註解格式。
 
 3. 通過繼承AuthorizeAttribute類別及覆寫其方法，新增自定義判斷會員是否為登入狀態的Attribute。
 
