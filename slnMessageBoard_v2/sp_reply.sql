@@ -38,8 +38,7 @@ GO
 CREATE PROCEDURE dbo.usp_Reply_Update
 (
 	@NewContent NVARCHAR(50),
-	@ReplyID INT,
-	@MemberID INT
+	@ReplyID INT
 )
 AS
 BEGIN

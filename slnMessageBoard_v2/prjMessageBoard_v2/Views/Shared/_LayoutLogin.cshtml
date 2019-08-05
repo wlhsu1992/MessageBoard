@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using prjMessageBoard_v2.Models
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -20,7 +22,7 @@
                 @Html.ActionLink("留言列表", "GetMessageList", "Message", new { area = "" }, new { @class = "navbar-brand" })
                 @Html.ActionLink("新增留言", "CreateMessage", "Message", new { area = "" }, new { @class = "navbar-brand" })
                 @Html.ActionLink("會員登出", "Logout", "Member", new { area = "" }, new { @class = "navbar-brand" })
-                <a href="#" align="button" class = "navbar-brand">@Session["Welcome"]</a>
+                <a href="#" align="button" class = "navbar-brand">@SessionManager.MemberWelcome</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav"></ul>

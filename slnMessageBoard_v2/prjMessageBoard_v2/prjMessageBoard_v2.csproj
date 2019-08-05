@@ -117,14 +117,16 @@
     <Compile Include="Controllers\MemberController.cs" />
     <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Controllers\ReplyController.cs" />
-    <Compile Include="Controllers\SessionController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\LoginAuthorizeAttribute.cs" />
     <Compile Include="Models\Member.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\MessageBoardModel.cs" />
+    <Compile Include="Models\ModelManager.cs" />
     <Compile Include="Models\Reply.cs" />
+    <Compile Include="Models\SessionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

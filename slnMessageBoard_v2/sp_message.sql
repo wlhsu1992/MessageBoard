@@ -59,8 +59,7 @@ CREATE PROCEDURE dbo.usp_Message_Update
 (
 	@NewTitle NVARCHAR(20),
 	@NewContent NVARCHAR(500),
-	@MessageID INT,
-	@MemberID INT
+	@MessageID INT
 )
 AS
 BEGIN
