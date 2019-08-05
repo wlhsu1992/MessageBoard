@@ -28,14 +28,14 @@ namespace prjMessageBoard_v2.Controllers
         /// 接收使用者於表單填寫資料，新增留言紀錄至資料表。
         /// 將頁面導向留言列表。
         /// </summary>
-        /// <param name="Title">由表單傳遞，創建留言標題</param>
-        /// <param name="Content">由表單傳遞，創建留言內容</param>
+        /// <param name="Title">欲新增留言標題</param>
+        /// <param name="Content">欲新增留言內容</param>
         /// <returns></returns>
         [LoginAuthorize]
         [HttpPost]
         public ActionResult CreateMessage(string Title, string Content)
         {
-            ModelManager.AddMessage(Title, Content);
+            ModelManager.CreateMessage(Title, Content);
             return RedirectToAction("GetMessageList","Message");
         }
 
@@ -49,12 +49,12 @@ namespace prjMessageBoard_v2.Controllers
             MessageBoardModel dbModel = new MessageBoardModel();
             dbModel = ModelManager.GetList();
 
-            if (dbModel.message.Count == 0)
+            if (dbModel.Message.Count == 0)
                 ViewBag.Alert = "目前尚無留言";
             else
             {
-                dbModel.message.Reverse();
-                dbModel.member.Reverse();
+                dbModel.Message.Reverse();
+                dbModel.Member.Reverse();
             }
 
             if (SessionManager.MemberID == null)
@@ -91,12 +91,12 @@ namespace prjMessageBoard_v2.Controllers
             MessageBoardModel dbModel = new MessageBoardModel();
             dbModel = ModelManager.GetTitle(keyword);
 
-            if (dbModel.message.Count == 0)
+            if (dbModel.Message.Count == 0)
                 ViewBag.Alert = $"沒有與關鍵字「{keyword}」相關的標題";
             else
             { 
-                dbModel.message.Reverse();
-                dbModel.member.Reverse();
+                dbModel.Message.Reverse();
+                dbModel.Member.Reverse();
             }
             if (Session["MemberID"] == null)
                 return View("GetMessageList", "_LayoutLogout", dbModel);

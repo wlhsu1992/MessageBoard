@@ -13,14 +13,14 @@ namespace prjMessageBoard_v2.Models
         /// <summary>
         /// 對應Member資料表欄位的List物件
         /// </summary>
-        public List<Member> member { get; set; }
+        public List<Member> Member { get; set; }
         /// <summary>
         /// 對應Message資料表欄位的List物件
         /// </summary>
-        public List<Message> message { get; set; }
+        public List<Message> Message { get; set; }
         /// <summary>
         /// 對應Reply資料表欄位的List物件
         /// </summary>
-        public List<Reply> reply { get; set; }
+        public List<Reply> Reply { get; set; }
     }
 }

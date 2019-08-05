@@ -44,7 +44,7 @@ namespace prjMessageBoard_v2.Controllers
                 return View();
             }
 
-            ModelManager.AddMember(Account,Password,Name);
+            ModelManager.CreateMember(Account,Password,Name);
             return RedirectToAction("Login");
         }
 
@@ -69,16 +69,15 @@ namespace prjMessageBoard_v2.Controllers
         public ActionResult Login(string Account, string Password)
         {
             DataTable dt = new DataTable();
-            //Member資料表取得指定 帳號Account及密碼Password的記錄
             dt = ModelManager.GetAccountAndPassword(Account, Password);
-             //有相符資料 → 表示該會員為註冊會員，紀錄Session，重新導向頁面至留言列表
+
             if (dt.Rows.Count != 0)
             {
                 SessionManager.MemberID = dt.Rows[0]["ID"];
                 SessionManager.MemberWelcome = $"{dt.Rows[0]["Account"]}({dt.Rows[0]["Name"]})您好";
                 return RedirectToAction("GetMessageList", "Message");
             }
-            //無相符資料 → 表示該會員非註冊會員，顯示錯誤，重新導向頁面至會員登入
+
             ViewBag.Alert = "輸入的帳號或密碼有誤！請重新輸入";
             return View();
         }

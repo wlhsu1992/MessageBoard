@@ -26,7 +26,7 @@ namespace prjMessageBoard_v2.Controllers
         [HttpPost]
         public ActionResult CreateReply(int MessageID, int MemberID, string ReplyContent)
         {
-            ModelManager.AddReply(MessageID, MemberID, ReplyContent);
+            ModelManager.CreateReply(MessageID, MemberID, ReplyContent);
             return RedirectToAction("GetMessageContent","Message", new { MessageID = MessageID });
         }
 

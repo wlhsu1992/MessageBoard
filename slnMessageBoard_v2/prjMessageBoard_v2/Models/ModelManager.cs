@@ -39,7 +39,7 @@ namespace prjMessageBoard_v2.Models
         /// <param name="Account">會員註冊帳號</param>
         /// <param name="Password">會員註冊密碼</param>
         /// <param name="Name">會員註冊名稱</param>
-        static public void AddMember(string Account, string Password, string Name)
+        static public void CreateMember(string Account, string Password, string Name)
         {
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -90,7 +90,7 @@ namespace prjMessageBoard_v2.Models
         /// </summary>
         /// <param name="Title">新增留言標題</param>
         /// <param name="Content">新增留言內容</param>
-        static public void AddMessage(string Title, string Content)
+        static public void CreateMessage(string Title, string Content)
         {
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -118,8 +118,8 @@ namespace prjMessageBoard_v2.Models
         static public MessageBoardModel GetList()
         {
             MessageBoardModel dbModel = new MessageBoardModel();
-            dbModel.message = new List<Message>();
-            dbModel.member = new List<Member>();
+            dbModel.Message = new List<Message>();
+            dbModel.Member = new List<Member>();
 
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -136,13 +136,13 @@ namespace prjMessageBoard_v2.Models
                         Title = reader.GetString(reader.GetOrdinal("Title")),
                         CreateTime = reader.GetDateTime(reader.GetOrdinal("CreateTime"))
                     };
-                    dbModel.message.Add(message);
+                    dbModel.Message.Add(message);
                     Member member = new Member
                     {
                         Account = reader.GetString(reader.GetOrdinal("Account")),
                         Name = reader.GetString(reader.GetOrdinal("Name"))
                     };
-                    dbModel.member.Add(member);
+                    dbModel.Member.Add(member);
                 }
             }
             return dbModel;
@@ -158,9 +158,9 @@ namespace prjMessageBoard_v2.Models
         {
 
             MessageBoardModel dbModel = new MessageBoardModel();
-            dbModel.member = new List<Member>();
-            dbModel.message = new List<Message>();
-            dbModel.reply = new List<Reply>();
+            dbModel.Member = new List<Member>();
+            dbModel.Message = new List<Message>();
+            dbModel.Reply = new List<Reply>();
 
             //存取顯示"留言"內容相關的資料庫欄位
             using (SqlConnection con = new SqlConnection(_conStr))
@@ -180,7 +180,7 @@ namespace prjMessageBoard_v2.Models
                         Name = reader.GetString(reader.GetOrdinal("Name")),
                         Account = reader.GetString(reader.GetOrdinal("Account"))
                     };
-                    dbModel.member.Add(member);
+                    dbModel.Member.Add(member);
                     Message message = new Message
                     {
                         ID = reader.GetInt32(reader.GetOrdinal("ID")),
@@ -189,9 +189,9 @@ namespace prjMessageBoard_v2.Models
                         CreateTime = reader.GetDateTime(reader.GetOrdinal("CreateTime")),
                         MemberID = reader.GetInt32(reader.GetOrdinal("MemberID"))
                     };
-                    dbModel.message.Add(message);
+                    dbModel.Message.Add(message);
                     Reply reply = new Reply();
-                    dbModel.reply.Add(reply);
+                    dbModel.Reply.Add(reply);
                 }
             }
 
@@ -213,9 +213,9 @@ namespace prjMessageBoard_v2.Models
                         Name = reader.GetString(reader.GetOrdinal("Name")),
                         Account = reader.GetString(reader.GetOrdinal("Account"))
                     };
-                    dbModel.member.Add(member);
+                    dbModel.Member.Add(member);
                     Message message = new Message();
-                    dbModel.message.Add(message);
+                    dbModel.Message.Add(message);
                     Reply reply = new Reply
                     {
                         ID = reader.GetInt32(reader.GetOrdinal("ID")),
@@ -223,7 +223,7 @@ namespace prjMessageBoard_v2.Models
                         ReplyTime = reader.GetDateTime(reader.GetOrdinal("ReplyTime")),
                         MemberID = reader.GetInt32(reader.GetOrdinal("MemberID"))
                     };
-                    dbModel.reply.Add(reply);
+                    dbModel.Reply.Add(reply);
                 }
             }
             return dbModel;
@@ -238,8 +238,8 @@ namespace prjMessageBoard_v2.Models
         static public MessageBoardModel GetTitle(string keyword)
         {
             MessageBoardModel dbModel = new MessageBoardModel();
-            dbModel.message = new List<Message>();
-            dbModel.member = new List<Member>();
+            dbModel.Message = new List<Message>();
+            dbModel.Member = new List<Member>();
 
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -259,13 +259,13 @@ namespace prjMessageBoard_v2.Models
                         Title = reader.GetString(reader.GetOrdinal("Title")),
                         CreateTime = reader.GetDateTime(reader.GetOrdinal("CreateTime"))
                     };
-                    dbModel.message.Add(message);
+                    dbModel.Message.Add(message);
                     Member member = new Member
                     {
                         Account = reader.GetString(reader.GetOrdinal("Account")),
                         Name = reader.GetString(reader.GetOrdinal("Name"))
                     };
-                    dbModel.member.Add(member);
+                    dbModel.Member.Add(member);
                 }
             }
             return dbModel;
@@ -280,7 +280,7 @@ namespace prjMessageBoard_v2.Models
         static public MessageBoardModel GetMessage(int MessageID)
         {
             MessageBoardModel dbModel = new MessageBoardModel();
-            dbModel.message = new List<Message>();
+            dbModel.Message = new List<Message>();
 
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -301,7 +301,7 @@ namespace prjMessageBoard_v2.Models
                         Content = reader.GetString(reader.GetOrdinal("Content")),
                         MemberID = reader.GetInt32(reader.GetOrdinal("MemberID"))
                     };
-                    dbModel.message.Add(message);
+                    dbModel.Message.Add(message);
                 }
             }
             return dbModel;
@@ -358,7 +358,7 @@ namespace prjMessageBoard_v2.Models
         /// <param name="MessageID">回覆所在的留言編號</param>
         /// <param name="MemberID">回覆者的會員編號</param>
         /// <param name="ReplyContent">回覆內容</param>
-        static public void AddReply(int MessageID, int MemberID, string ReplyContent)
+        static public void CreateReply(int MessageID, int MemberID, string ReplyContent)
         {
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -387,7 +387,7 @@ namespace prjMessageBoard_v2.Models
         static public MessageBoardModel GetReply(int ReplyID)
         {
             MessageBoardModel dbModel = new MessageBoardModel();
-            dbModel.reply = new List<Reply>();
+            dbModel.Reply = new List<Reply>();
 
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -409,7 +409,7 @@ namespace prjMessageBoard_v2.Models
                         MemberID = reader.GetInt32(reader.GetOrdinal("MemberID")),
                         ReplyContent = reader.GetString(reader.GetOrdinal("ReplyContent")),
                     };
-                    dbModel.reply.Add(reply);
+                    dbModel.Reply.Add(reply);
                 }
             }
             return dbModel;
