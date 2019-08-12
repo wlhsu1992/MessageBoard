@@ -19,7 +19,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("留言列表", "GetMessageList", "Message", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("留言列表", "GetDiscussionList", "Message", new { area = "" }, new { @class = "navbar-brand" })
                 @Html.ActionLink("新增留言", "CreateMessage", "Message", new { area = "" }, new { @class = "navbar-brand" })
                 @Html.ActionLink("會員登出", "Logout", "Member", new { area = "" }, new { @class = "navbar-brand" })
                 <a href="#" align="button" class = "navbar-brand">@SessionManager.MemberWelcome</a>

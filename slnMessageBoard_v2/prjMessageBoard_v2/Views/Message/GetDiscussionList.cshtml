@@ -1,5 +1,5 @@
-﻿@using System.Data
-@model prjMessageBoard_v2.Models.MessageBoardModel
+﻿@using prjMessageBoard_v2.Models
+@model List<MessageBoardViewlModel.Discussion>
 
 
 @{
@@ -23,7 +23,7 @@
         <th>留言時間</th>
     </tr>
 
-    @if (Model.message.Count == 0)
+    @if (Model.Count == 0)
     {
         <tr>
             <td></td>
@@ -35,17 +35,17 @@
 
     else
     {
-        for (int i = 0; i < Model.message.Count; i++)
+        for (int i = 0; i < Model.Count; i++)
         {
             <tr>
-                <td>@Model.message[i].ID</td>
+                <td>@Model[i].MessageID</td>
                 <td>
-                    <a href=@Url.Action("GetMessageContent",new { MessageID = @Model.message[i].ID })>
-                        @Model.message[i].Title
+                    <a href=@Url.Action("GetDiscussionContent",new { MessageID = @Model[i].MessageID })>
+                     @Model[i].Title
                     </a>
                 </td>
-                <td>@Model.member[i].Account (@Model.member[i].Name)</td>
-                <td>@Model.message[i].CreateTime</td>
+                <td>@Model[i].Account (@Model[i].Name)</td>
+                <td>@Model[i].CreateTime</td>
             </tr>
         }
     }

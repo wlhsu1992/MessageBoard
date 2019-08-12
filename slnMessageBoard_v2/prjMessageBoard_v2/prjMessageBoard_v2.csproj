@@ -106,8 +106,8 @@
     <Content Include="Web.config" />
     <Content Include="Views\Member\Login.cshtml" />
     <Content Include="Views\Message\CreateMessage.cshtml" />
-    <Content Include="Views\Message\GetMessageList.cshtml" />
-    <Content Include="Views\Message\GetMessageContent.cshtml" />
+    <Content Include="Views\Message\GetDiscussionList.cshtml" />
+    <Content Include="Views\Message\GetDiscussionContent.cshtml" />
     <Content Include="Views\Message\UpdateMessage.cshtml" />
     <Content Include="Views\Reply\UpdateReply.cshtml" />
     <Content Include="Views\Shared\_LayoutLogin.cshtml" />
@@ -121,12 +121,11 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\LoginAuthorizeAttribute.cs" />
-    <Compile Include="Models\Member.cs" />
-    <Compile Include="Models\Message.cs" />
-    <Compile Include="Models\MessageBoardModel.cs" />
-    <Compile Include="Models\ModelManager.cs" />
-    <Compile Include="Models\Reply.cs" />
+    <Compile Include="Models\LoginMemberModel.cs" />
+    <Compile Include="Models\MessageBoardViewModel.cs" />
+    <Compile Include="Models\MessageBoardModelManager.cs" />
     <Compile Include="Models\SessionManager.cs" />
+    <Compile Include="Models\FileManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Photos\" />
     <Folder Include="Views\Session\" />
   </ItemGroup>
   <PropertyGroup>

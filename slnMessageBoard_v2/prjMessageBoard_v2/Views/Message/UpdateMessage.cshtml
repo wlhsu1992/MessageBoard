@@ -1,5 +1,5 @@
 ﻿@using System.Data
-@model prjMessageBoard_v2.Models.MessageBoardModel
+@model prjMessageBoard_v2.Models.MessageBoardViewlModel.MessageEditor
 
 @{
     ViewBag.Title = "編輯留言";
@@ -10,13 +10,15 @@
 <div>
     <form method="post" action="@Url.Action("UpdateMessage")">
         <div>
-            <input type="number" name="MessageID" value="@Model.message[0].ID" class="hidden" />
-            <input type="number" name="MemberID" value="@Session["MemberID"]" class="hidden" />
-            <p>留言標題:<input type="text" name="NewTitle" value="@Model.message[0].Title" 
-                           maxlength="20" required /></p>
+            <input type="number" name="messageID" value="@Model.ID" class="hidden" />
+            <input type="number" name="memberID" value="@Session["MemberID"]" class="hidden" />
+            <p>
+                留言標題:<input type="text" name="newTitle" value="@Model.Title"
+                            maxlength="20" required />
+            </p>
             <p>內容</p>
-            <textarea cols="50" rows="5" name="NewContent" placeholder="此數輸入留言．．．(輸入上限為500字)"
-                      maxlength="500" required>@Model.message[0].Content</textarea>
+            <textarea cols="50" rows="5" name="newContent" placeholder="此數輸入留言．．．(輸入上限為500字)"
+                      maxlength="500" required>@Model.Content</textarea>
             <p><input type="submit" value="確認編輯" onclick="return confirm('確定修改留言嗎?')" /></p>
         </div>
     </form>

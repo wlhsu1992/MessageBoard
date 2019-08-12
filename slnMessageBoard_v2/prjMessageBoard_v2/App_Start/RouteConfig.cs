@@ -16,7 +16,7 @@ namespace prjMessageBoard_v2
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Message", action = "GetMessageList", id = UrlParameter.Optional }
+                defaults: new { controller = "Message", action = "GetDiscussionList", id = UrlParameter.Optional }
             );
         }
     }

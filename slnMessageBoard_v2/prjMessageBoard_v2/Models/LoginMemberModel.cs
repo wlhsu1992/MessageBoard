@@ -6,25 +6,21 @@ using System.Web;
 namespace prjMessageBoard_v2.Models
 {
     /// <summary>
-    /// 會員資料表
+    /// 會員登入後識別資料屬性
     /// </summary>
-    public class Member
+    public class LoginMemberModel
     {
         /// <summary>
         /// 會員編號
         /// </summary>
-        public int ID { get; set; }
+        public int MemberID { get; set; }
         /// <summary>
         /// 會員帳號
         /// </summary>
-        public string Account { get; set; } 
-        /// <summary>
-        /// 會員密碼
-        /// </summary>
-        public string Password { get; set; } 
+        public string Account { get; set; }
         /// <summary>
         /// 會員名稱
         /// </summary>
-        public string Name { get; set; }      
+        public string Name { get; set; }
     }
 }

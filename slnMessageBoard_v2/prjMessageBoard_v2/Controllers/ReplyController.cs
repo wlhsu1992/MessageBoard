@@ -12,67 +12,79 @@ namespace prjMessageBoard_v2.Controllers
 {
     public class ReplyController : Controller
     {
-         string _conStr = System.Web.Configuration.WebConfigurationManager.ConnectionStrings["dbMessageBoard"].ConnectionString;
+         private string _conStr = System.Web.Configuration.WebConfigurationManager.ConnectionStrings["dbMessageBoard"].ConnectionString;
 
         /// <summary>
-        /// 新增留言回覆紀錄，
-        /// 將頁面導向該則回覆所在留言串的內容頁面。
+        /// 接收表單參數，新增留言回覆，導向該則回覆所在的內容動作方法。
         /// </summary>
-        /// <param name="MessageID">欲新增回覆記錄的留言編號</param>
-        /// <param name="MemberID">欲新增回覆的會員編號</param>
-        /// <param name="ReplyContent">欲新增回覆的回覆內容</param>
+        /// <param name="messageID">欲新增回覆所在的留言編號</param>
+        /// <param name="memberID">欲新增回覆的會員編號</param>
+        /// <param name="replyContent">欲新增回覆的回覆內容</param>
         /// <returns></returns>
         [LoginAuthorize]
         [HttpPost]
-        public ActionResult CreateReply(int MessageID, int MemberID, string ReplyContent)
+        public ActionResult CreateReply(int messageID, int memberID, string replyContent)
         {
-            ModelManager.CreateReply(MessageID, MemberID, ReplyContent);
-            return RedirectToAction("GetMessageContent","Message", new { MessageID = MessageID });
+            MessageBoardModelManager.CreateReply(messageID, memberID, replyContent);
+            return RedirectToAction("GetDiscussionContent","Message", new { messageID = messageID });
         }
 
         /// <summary>
-        /// 由資料表取得指定回覆編號的留言內容，
-        /// 將該筆留言內容傳遞給修改留言的檢視頁面。
+        /// 取得指定回覆編號(replyID)的回覆記錄，將記錄傳遞給更新檢視頁面。
         /// </summary>
-        /// <param name="ReplyID">欲取得紀錄的回覆編號</param>
+        /// <param name="replyID">欲取得記錄的回覆編號</param>
         /// <returns></returns>
         [LoginAuthorize]
-        public ActionResult UpdateReply(int ReplyID)
+        public ActionResult UpdateReply(int replyID)
         {
-            MessageBoardModel dbModel = new MessageBoardModel();
-            dbModel = ModelManager.GetReply(ReplyID);
-            return View("UpdateReply", "_LayoutLogin", dbModel);
+            MessageBoardViewlModel.ReplyEditor reply = MessageBoardModelManager.GetReply(replyID);
+            return View("UpdateReply", "_LayoutLogin", reply);
         }
 
         /// <summary>
-        /// 由表單輸入的回覆內容，更新回指定紀錄的資料表，
-        /// 將頁面導向該則回覆所在留言串的內容頁面。
+        /// 接收表單參數，修改回覆內容。
+        /// 若修改發生錯誤，顯示提示訊息，導向輸入修改回覆表單動作方法；
+        /// 若修改成功，導向該則回覆所在的內容動作方法
         /// </summary>
-        /// <param name="MessageID">欲更新紀錄的留言編號</param>
-        /// <param name="ReplyID">欲更新紀錄的回覆編號</param>
-        /// <param name="NewContent">編輯後回覆內容</param>
-        /// <returns></returns>
-        [LoginAuthorize]
-        [HttpPost]
-        public ActionResult UpdateReply(int MessageID, int ReplyID, string NewContent)
-        {
-            ModelManager.UpdateReply(ReplyID, NewContent);
-            return RedirectToAction("GetMessageContent","Message", new { MessageID = MessageID });
-        }
-
-        /// <summary>
-        /// 於資料表中，刪除指定編號的記錄。
-        /// 將頁面導向該則回覆所在留言串的內容頁面。
-        /// </summary>
-        /// <param name="MessageID">欲刪除回覆的留言編號</param>
-        /// <param name="ReplyID">欲刪除回覆的回覆編號</param>
+        /// <param name="messageID">欲更新記錄的留言編號</param>
+        /// <param name="replyID">欲更新記錄的回覆編號</param>
+        /// <param name="newContent">編輯後回覆內容</param>
         /// <returns></returns>
         [LoginAuthorize]
         [HttpPost]
-        public ActionResult DeleteReply(int MessageID, int ReplyID)
+        public ActionResult UpdateReply(int messageID, int replyID, string newContent)
         {
-            ModelManager.DeleteReply(ReplyID);
-            return RedirectToAction("GetMessageContent","Message", new { MessageID = MessageID });
+            try
+            {
+                MessageBoardModelManager.UpdateReply(replyID, newContent);
+            }
+            catch (Exception ex)
+            {
+                TempData["Alert"] = "修改時發生錯誤，請重新操作一次";
+                return RedirectToAction("UpdateReply", "Reply", new { replyID = replyID });
+            }
+            return RedirectToAction("GetDiscussionContent","Message", new { messageID = messageID });
+        }
+
+        /// <summary>
+        /// 刪除指定編號的記錄，導向該則回覆所在的內容動作方法。
+        /// </summary>
+        /// <param name="messageID">欲刪除回覆的留言編號</param>
+        /// <param name="replyID">欲刪除回覆的回覆編號</param>
+        /// <returns></returns>
+        [LoginAuthorize]
+        [HttpPost]
+        public ActionResult DeleteReply(int messageID, int replyID)
+        {
+            try
+            {
+                MessageBoardModelManager.DeleteReply(replyID);
+            }
+            catch (Exception ex)
+            {
+                TempData["Alert"] = "刪除時發生錯誤，請重新操作一次";
+            }
+            return RedirectToAction("GetDiscussionContent","Message", new { messageID = messageID });
         }
     }
 }

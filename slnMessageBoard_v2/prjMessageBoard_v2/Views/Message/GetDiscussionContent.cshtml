@@ -1,0 +1,102 @@
+﻿@using System.Data
+@model prjMessageBoard_v2.Models.MessageBoardViewlModel.DiscussionContent
+
+@{
+    ViewBag.Title = "留言板" + Model.Title;
+}
+
+<h3><span>標題 : </span>@Model.Title</h3>
+<span>留言者:</span> @Model.Account (@Model.Name)
+---
+<span>留言時間:</span> @Model.CreateTime
+
+<hr />
+<h3>留言內容</h3>
+
+<textarea cols="100" rows="5" readonly>
+@Model.Content
+</textarea>
+<p></p>
+@if (Model.PhotoID != string.Empty)
+{
+    <img src="../Photos/@Model.PhotoID" width="280" height="190" />
+}
+
+<p>
+    @if (Session["MemberID"] != null && Session["MemberID"].Equals(Model.MemberID))
+    {
+        <div class="row">
+            <div class="col-xs-1">
+                <form method="get" action="@Url.Action("UpdateMessage")">
+                    <input type="number" name="messageID" value="@Model.MessageID" class="hidden" />
+                    <input type="submit" value="修改留言" />
+                </form>
+            </div>
+            <div class="col-xs-1">
+                <form method="post" action="@Url.Action("DeleteMessage")">
+                    <input type="number" name="messageID" value="@Model.MessageID" class="hidden" />
+                    <input type="submit" value="刪除留言" onclick="return confirm('刪除留言會一併刪除回覆，確定要刪除留言嗎?')" />
+                </form>
+            </div>
+        </div>
+    }
+</p>
+
+<hr />
+
+@if (@Model.ReplyList.Count == 0)
+{
+    <div>尚無任何回覆------</div>
+}
+else
+{
+    for (int i = 0; i < Model.ReplyList.Count; i++)
+    {
+        <h4>#回覆@(i+1)</h4>
+        <textarea cols="50" rows="3" readonly>@Model.ReplyList[i].ReplyContent</textarea>
+        <p>
+            <span>留言者:</span> @Model.ReplyList[i].Account (@Model.ReplyList[i].Name)
+            <span>留言時間:</span> @Model.ReplyList[i].ReplyTime
+        </p>
+
+        <p>
+            @if (Session["MemberID"] != null && Session["MemberID"].Equals(Model.ReplyList[i].MemberID))
+            {
+                <div class="row">
+                    <div class="col-xs-1">
+                        <form method="get" action="@Url.Action("UpdateReply","Reply")">
+                            <input type="number" name="replyID" value="@Model.ReplyList[i].ReplyID" class="hidden" />
+                            <input type="submit" value="修改回覆" />
+                        </form>
+                    </div>
+                    <div class="col-xs-1">
+                        <form method="post" action="@Url.Action("DeleteReply","Reply")">
+                            <input type="number" value="@Model.ReplyList[i].ReplyID" name="replyID" class="hidden" />
+                            <input type="number" value="@Model.MessageID" name="messageID" class="hidden" />
+                            <input type="submit" value="刪除回覆" onclick="return confirm('確定要刪除回覆嗎?')" />
+                        </form>
+                    </div>
+                </div>
+            }
+        </p>
+        <hr />
+    }
+
+}
+<hr />
+
+@if (Session["MemberID"] != null)
+{
+    <form method="post" action="@Url.Action("CreateReply","Reply")">
+        <div>
+            <input type="number" name="messageID" value="@Model.MessageID" class="hidden" />
+            <input type="number" name="memberID" value="@Session["MemberID"]" class="hidden" />
+            <p>回覆內容:</p>
+            <p>
+                <textarea cols="50" rows="3" name="replyContent" placeholder="一則留言回覆上限為50字"
+                          maxlength="50" required></textarea>
+            </p>
+            <p><input type="submit" value="回覆留言" /></p>
+        </div>
+    </form>
+}

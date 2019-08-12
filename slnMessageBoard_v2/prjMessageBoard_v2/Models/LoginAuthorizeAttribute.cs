@@ -8,7 +8,7 @@ namespace prjMessageBoard_v2.Models
 {
     /// <summary>
     /// 通過Session["MemberID"]判斷使用者是否為登入狀態，
-    /// 在將頁面導入指定Action以前進行驗證。
+    /// 若為非登入狀態則將頁面導向會員登入頁面。
     /// </summary>
     public class LoginAuthorizeAttribute : AuthorizeAttribute 
     {

@@ -10,8 +10,8 @@ namespace prjMessageBoard_v2.Models
         /// <summary>
         /// 對指定名稱的Session指派值
         /// </summary>
-        /// <param name="sessionName">指定Session名稱</param>
-        /// <param name="sessionValue">指派值</param>
+        /// <param name="sessionName">Session名稱</param>
+        /// <param name="sessionValue">Session指派值</param>
         public static void Save<T> (string sessionName, T sessionValue)
         {
             HttpContext.Current.Session[sessionName] = sessionValue;
@@ -28,33 +28,39 @@ namespace prjMessageBoard_v2.Models
         }
 
         /// <summary>
-        /// 用來判斷使用者是否為登入狀態
+        /// 識別使用者是否為登入狀態
         /// </summary>
-        public static object MemberID
+        public static int? MemberID
         {
             get
             {
-                return Get<int?>(nameof(MemberID));
+                return Get<int?>(SessionName.MemberID);
             }
             set
             {
-                Save(nameof(MemberID), value);
+                Save(SessionName.MemberID, value);
             }
         }
 
         /// <summary>
-        /// 用來作為使用者登入後的指示詞
+        /// 使用者登入後的歡迎詞
         /// </summary>
         public static string MemberWelcome
         {
             get
             {
-                return Get<string>(nameof(MemberWelcome));
+                return Get<string>(SessionName.MemberWelcome);
             }
             set
             {
-                Save(nameof(MemberWelcome), value);
+                Save(SessionName.MemberWelcome , value);
             }
+        }
+
+        public struct SessionName
+        {
+            internal const string MemberID = "MemberID";
+            internal const string MemberWelcome = "MemberWelcome";
         }
     }
 }
