@@ -37,3 +37,27 @@ sp_member、sp_message、sp_reply 為MSSQL stored procedure create 檔案
 3. 通過繼承AuthorizeAttribute類別及覆寫其方法，新增自定義判斷會員是否為登入狀態的Attribute。
 
 4. 在Model資料夾下新增ModelManager類別，存放原Controller中操作資料庫程序的程式碼。
+
+====================================================================================================
+[第三次改動-針對issue部分修改]
+1. 調整DTO Model層規劃
+　　．將與操作留言板資料庫相關的類別集中存放在MessageBoardModelManager類別下，
+　　　並依據不同操作行為個別命名
+    ．將DTO會使用到的資料欄位類別集中存放在MessageBoardViewModel類別下，
+      並依據不同存取資料集個別命名
+
+2. 改使用LINQ方法對資料進行排序，而非Reverse方法
+
+3. 將專案所有DataTable資料型別都改由其他明確方式決定
+
+4. 使用try...catch 判斷Update及Delete方法是否成功
+
+5. 使用struct明確定義SessionKey Name 而不是使用nameof
+
+6. 新增圖片上傳功能
+
+7. 修改專案部分類別的存取修飾字層級
+   ．將MessageBoardModelManager(與操作留言板相關資料庫行為類別)設為internal層級
+　 ．將FileManager (與上傳資料相關類別)設定為internal層級
+   ．將ADO.NET連線字串設為private層級
+   ．其餘皆維持為public層級
