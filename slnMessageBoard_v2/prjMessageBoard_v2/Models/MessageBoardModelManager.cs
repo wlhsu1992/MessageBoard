@@ -11,7 +11,7 @@ namespace prjMessageBoard_v2.Models
     /// <summary>
     /// 操作MessageBoard相關資料庫的行為
     /// </summary>
-    public class MessageBoardModelManager
+    internal class MessageBoardModelManager
     {
         private static string _conStr = System.Web.Configuration.WebConfigurationManager.ConnectionStrings["dbMessageBoard"].ConnectionString;
         /// <summary>
@@ -20,7 +20,7 @@ namespace prjMessageBoard_v2.Models
         /// </summary>
         /// <param name="account">使用者輸入註冊帳號</param>
         /// <returns></returns>
-        public static bool GetAccount(string account)
+        internal static bool GetAccount(string account)
         {
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -43,7 +43,7 @@ namespace prjMessageBoard_v2.Models
         /// <param name="account">會員註冊帳號</param>
         /// <param name="password">會員註冊密碼</param>
         /// <param name="name">會員註冊名稱</param>
-        public static void CreateMember(string account, string password, string name)
+        internal static void CreateMember(string account, string password, string name)
         {
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -69,7 +69,7 @@ namespace prjMessageBoard_v2.Models
         /// <param name="account">會員登入帳號</param>
         /// <param name="password">會員登入密碼</param>
         /// <returns></returns>
-        public static LoginMemberModel CheckLogin(string account, string password)
+        internal static LoginMemberModel CheckLogin(string account, string password)
         {
             LoginMemberModel memberData = new LoginMemberModel();
 
@@ -100,7 +100,7 @@ namespace prjMessageBoard_v2.Models
         /// 取得留言板列表所需欄位，列表順序依照留言建立時間降序排序
         /// </summary>
         /// <returns></returns>
-        public static List<MessageBoardViewlModel.Discussion> GetDiscussionList()
+        internal static List<MessageBoardViewlModel.Discussion> GetDiscussionList()
         {
             List<MessageBoardViewlModel.Discussion> messageTitleList = new List<MessageBoardViewlModel.Discussion>();
 
@@ -132,7 +132,7 @@ namespace prjMessageBoard_v2.Models
         /// </summary>
         /// <param name="messageID">欲取得留言內容的留言編號</param>
         /// <returns></returns>
-        public static MessageBoardViewlModel.DiscussionContent GetDiscussionContent(int messageID)
+        internal static MessageBoardViewlModel.DiscussionContent GetDiscussionContent(int messageID)
         {
             List<MessageBoardViewlModel.DiscussionReply> replyList = new List<MessageBoardViewlModel.DiscussionReply>();
 
@@ -198,7 +198,7 @@ namespace prjMessageBoard_v2.Models
         /// </summary>
         /// <param name="keyword">搜尋留言標題關鍵字</param>
         /// <returns></returns>
-        public static List<MessageBoardViewlModel.Discussion> SearchTitle(string keyword)
+        internal static List<MessageBoardViewlModel.Discussion> SearchTitle(string keyword)
         {
             List<MessageBoardViewlModel.Discussion> messageTitleList = new List<MessageBoardViewlModel.Discussion>();
 
@@ -236,7 +236,7 @@ namespace prjMessageBoard_v2.Models
         /// <param name="title">欲新增留言標題</param>
         /// <param name="content">欲新增留言內容</param>
         /// <param name="photoID">欲新增圖片檔案編碼</param>
-        public static void CreateMessage(string title, string content, string photoID)
+        internal static void CreateMessage(string title, string content, string photoID)
         {
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -263,7 +263,7 @@ namespace prjMessageBoard_v2.Models
         /// </summary>
         /// <param name="messageID">欲取得資料欄位的留言編號</param>
         /// <returns></returns>
-        public static string GetPhotoID(int messageID)
+        internal static string GetPhotoID(int messageID)
         {
             string photoID;
 
@@ -289,7 +289,7 @@ namespace prjMessageBoard_v2.Models
         /// </summary>
         /// <param name="messageID">欲取得留言內容的留言編號</param>
         /// <returns></returns>
-        public static MessageBoardViewlModel.MessageEditor GetMessage(int messageID)
+        internal static MessageBoardViewlModel.MessageEditor GetMessage(int messageID)
         {
             MessageBoardViewlModel.MessageEditor message = new MessageBoardViewlModel.MessageEditor();
             using (SqlConnection con = new SqlConnection(_conStr))
@@ -319,7 +319,7 @@ namespace prjMessageBoard_v2.Models
         /// <param name="messageID">欲修改的留言編號</param>
         /// <param name="newTitle">修改後留言標題</param>
         /// <param name="newContent">修改後留言內容</param>
-        public static void UpdateMessage(int messageID, string newTitle, string newContent)
+        internal static void UpdateMessage(int messageID, string newTitle, string newContent)
         {
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -343,7 +343,7 @@ namespace prjMessageBoard_v2.Models
         /// 刪除指定留言編號(messagID)記錄及於留言串列下所有回覆內容
         /// </summary>
         /// <param name="messageID">欲刪除的留言編號</param>
-        public static void DeleteMessage(int messageID)
+        internal static void DeleteMessage(int messageID)
         {
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -364,7 +364,7 @@ namespace prjMessageBoard_v2.Models
         /// <param name="messageID">回覆所在的留言編號</param>
         /// <param name="memberID">回覆者的會員編號</param>
         /// <param name="replyContent">回覆內容</param>
-        public static void CreateReply(int messageID, int memberID, string replyContent)
+        internal static void CreateReply(int messageID, int memberID, string replyContent)
         {
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -388,7 +388,7 @@ namespace prjMessageBoard_v2.Models
         /// </summary>
         /// <param name="replyID">欲取得記錄的回覆編號</param>
         /// <returns></returns>
-        public static MessageBoardViewlModel.ReplyEditor GetReply(int replyID)
+        internal static MessageBoardViewlModel.ReplyEditor GetReply(int replyID)
         {
             MessageBoardViewlModel.ReplyEditor reply = new MessageBoardViewlModel.ReplyEditor();
 
@@ -419,7 +419,7 @@ namespace prjMessageBoard_v2.Models
         /// </summary>
         /// <param name="replyID">欲修改記錄的回覆編號</param>
         /// <param name="newContent">修改後的回覆內容</param>
-        public static void UpdateReply(int replyID, string newContent)
+        internal static void UpdateReply(int replyID, string newContent)
         {
             using (SqlConnection con = new SqlConnection(_conStr))
             {
@@ -441,7 +441,7 @@ namespace prjMessageBoard_v2.Models
         /// 由Reply資料表，刪除指定回覆編號MemberID的記錄。
         /// </summary>
         /// <param name="replyID">欲刪除回覆記錄的編號</param>
-        public static void DeleteReply(int replyID)
+        internal static void DeleteReply(int replyID)
         {
             using (SqlConnection con = new SqlConnection(_conStr))
             {
