@@ -1,7 +1,5 @@
 # slnMessageBoard 專案修改歷程 
 
-<h1 color="red">123</h1>
-
 ## [第一次改動-針對issue部分修改]
 
 1. 新增Controller集中擺放專案Session
