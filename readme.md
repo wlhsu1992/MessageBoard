@@ -47,7 +47,7 @@
 6. 新增圖片上傳功能
 
 7. 修改專案部分類別的存取修飾字層級
-  * 將MessageBoardModelManager(與操作留言板相關資料庫行為類別)設為internal層級
-  * 將FileManager (與上傳資料相關類別)設定為internal層級
-  * 將ADO.NET連線字串設為private層級
-  * 其餘皆維持為public層級
+    * 將MessageBoardModelManager(與操作留言板相關資料庫行為類別)設為internal層級
+    * 將FileManager (與上傳資料相關類別)設定為internal層級
+    * 將ADO.NET連線字串設為private層級
+    * 其餘皆維持為public層級
