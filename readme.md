@@ -33,8 +33,8 @@
 ## [第三次改動-針對issue部分修改]
 
 1. 調整DTO Model層規劃
-  * 將與操作留言板資料庫相關的類別集中存放在MessageBoardModelManager類別下，並依據不同操作行為個別命名
-  * 將DTO會使用到的資料欄位類別集中存放在MessageBoardViewModel類別下，並依據不同存取資料集個別命名
+    * 將與操作留言板資料庫相關的類別集中存放在MessageBoardModelManager類別下，並依據不同操作行為個別命名
+    * 將DTO會使用到的資料欄位類別集中存放在MessageBoardViewModel類別下，並依據不同存取資料集個別命名
 
 2. 改使用LINQ方法對資料進行排序，而非Reverse方法
 
@@ -47,7 +47,7 @@
 6. 新增圖片上傳功能
 
 7. 修改專案部分類別的存取修飾字層級
-* 將MessageBoardModelManager(與操作留言板相關資料庫行為類別)設為internal層級
-* 將FileManager (與上傳資料相關類別)設定為internal層級
-* 將ADO.NET連線字串設為private層級
-* 其餘皆維持為public層級
+  * 將MessageBoardModelManager(與操作留言板相關資料庫行為類別)設為internal層級
+  * 將FileManager (與上傳資料相關類別)設定為internal層級
+  * 將ADO.NET連線字串設為private層級
+  * 其餘皆維持為public層級
