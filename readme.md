@@ -4,11 +4,11 @@
 3. 設置權限設定，如：會員只能修改自己的留言。 
 4. 留言上傳圖片檔案功能。
 
-未登入時系統功能架構
-![](https://imgur.com/TbQmj7w)
+**未登入時系統功能架構**<br/>
+<img src="./未登入前功能列表.png">
 
-登入時系統功能架構
-![](https://imgur.com/v6ilZXR)
+**登入時系統功能架構** <br/>
+<img src="./登入後功能列表.png">
 
 # [專案架構]
 1. 使用ASP.NET MVC架構進行撰寫。
@@ -16,4 +16,4 @@
 3. 前端頁面使用基礎 HTML、CSS、JavaScript來完成版面。
 
 # [Schema規劃]
-![](https://imgur.com/dkvteij)
+<img src="./Table Schema.png">
